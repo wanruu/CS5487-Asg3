@@ -6,12 +6,21 @@ from utils import euclidean, centers_init
 
 
 class KMeans:
-    def __init__(self, max_iter=1000, center_init="default", dist_func="euclidean"):
+    def __init__(self, max_iter=1000, center_init="default", dist_func="euclidean", weight_para=None):
         self.max_iter = max_iter
         if dist_func == "euclidean":
             self.dist_func = euclidean
+        elif dist_func == "q2b":
+            self.dist_func = self.kmeans_dist_q2
+            self.weight_para = weight_para
         if center_init == "default":
             self.centers_init = centers_init
+
+
+    def kmeans_dist_q2(x1, x2):
+        tmp = np.power(x1 - x2, 2).flatten()
+        result = (tmp[0] + tmp[1]) + self.weight_para * (tmp[2] + tmp[3])
+        return result
 
     def fit(self, points, k):
         """

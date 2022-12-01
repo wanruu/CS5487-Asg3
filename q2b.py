@@ -9,7 +9,7 @@ import numpy as np
 import pylab as pl
 
 
-IMG_PATH = "p2a-imgs"
+IMG_PATH = "p2b-imgs"
 if not os.path.exists(IMG_PATH):
     os.mkdir(IMG_PATH)
 
@@ -30,12 +30,11 @@ def plot():
     pl.imshow(csegm)
 
 
-import scipy.cluster.vq as vq
-
 DATA_Q2 = DATA_Q2#[:1]
 for idx, img in enumerate(DATA_Q2):
     if ID_Q2[idx] != "56028":
         continue
+
     # create directory
     save_path = f"{IMG_PATH}/{ID_Q2[idx]}"
     if not os.path.exists(save_path):
@@ -64,12 +63,15 @@ for idx, img in enumerate(DATA_Q2):
     # ------------------------------------
 
     # ------------- meanshift -------------
-    for h in np.arange(1, 50, 1):
-        mean_shift = MeanShift(bandwidth=h)
-        labels = mean_shift.fit(X.T) + 1
-        plot()
-        # h = str("%.1f" % h).replace(".", "_")
-        pl.savefig(f"{save_path}/meanshift(h={h})")
+
+    for hc in np.arange(1, 10, 1):
+        for hp in np.arange(1, 10, 1):
+            bandwidth = (hc, hp)
+            mean_shift = MeanShift(bandwidth=bandwidth, kernel="q2b")
+            labels = mean_shift.fit(X.T) + 1
+            plot()
+            # h = str("%.1f" % h).replace(".", "_")
+            pl.savefig(f"{save_path}/meanshift(hc={hc}-hp={hp})")
     # ------------------------------------
 
 

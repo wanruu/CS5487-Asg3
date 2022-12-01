@@ -1,7 +1,6 @@
 import time
 import numpy as np
 
-
 SHIFT_THRESHOLD = 1e-6
 CLUSTER_THRESHOLD = 1e-1
 
@@ -11,6 +10,8 @@ class MeanShift:
         self.bandwidth = bandwidth
         if kernel == "gaussian":
             self.kernel = self.gaussian_kernel
+        elif kernel == "q2b":
+            self.kernel = self.meanshift_kernel_q2
 
 
     def gaussian_kernel(self, center: np.array, points: np.array):
@@ -22,6 +23,23 @@ class MeanShift:
         # distances = np.array([np.linalg.norm(center - points[i]) for i in range(n)])
         distances = np.sqrt(((center - points)**2).sum(axis=1))
         weights = (1/(self.bandwidth*np.sqrt(2*np.pi))) * np.exp(-0.5*distances**2/self.bandwidth**2)
+        return weights  # (n,)
+
+    def meanshift_kernel_q2(self, center: np.array, points: np.array):
+        """
+        center: (4,)
+        points: (3060, 4)
+        """
+        n, _ = points.shape
+        hc, hp = self.bandwidth
+
+        centers = np.split(center, 2)  # (2,2)
+        pointss = [item.T for item in np.split(points.T, 2)]  # (2,3060,2)
+        
+        dist1 = np.sqrt(((centers[0] - pointss[0])**2).sum(axis=1))  # (3060,)
+        dist2 = np.sqrt(((centers[1] - pointss[1])**2).sum(axis=1))  # (3060,)
+        exp = -dist1**2/2/hc**2 - dist2**2/2/hp**2
+        weights = (1 / np.pi**2 / hc**2 / hp**2) * np.exp(exp)
         return weights  # (n,)
 
 
@@ -62,7 +80,7 @@ class MeanShift:
                 # shift
                 shift_points[idx] = shift_point
             interation += 1
-            if interation % 10 == 0:
+            if interation % 100 == 0:
                 print(f"iter={interation}, max_shift_dist={max_shift_dist}")
 
         # cluster
