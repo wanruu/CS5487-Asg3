@@ -1,3 +1,4 @@
+import re
 import os
 import numpy as np
 from PIL import Image
@@ -17,9 +18,9 @@ DATA_Q1 = {
 }
 
 
-filenames = ["images/"+f for f in os.listdir("images/") if f[-4:] == ".jpg"]
-DATA_Q2_RAW = [Image.open(f) for f in filenames]
-# DATA_Q2 = [helper.getfeatures(Image.open(f), 7) for f in filenames]
+_filenames = ["images/"+f for f in os.listdir("images/") if f[-4:] == ".jpg"]
+DATA_Q2 = [Image.open(f) for f in _filenames]
+ID_Q2 = [re.search(r"(\d+)\.jpg", f).group(1) for f in _filenames]
 
 
 def plot(points, labels, title, centers=[], dirname="p1-imgs"):
