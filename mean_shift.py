@@ -1,6 +1,6 @@
+import time
 import numpy as np
-from utils import DATA_Q1, plot
-import matplotlib.pyplot as plt
+
 
 SHIFT_THRESHOLD = 1e-6
 CLUSTER_THRESHOLD = 1e-1
@@ -36,12 +36,16 @@ class MeanShift:
 
 
     def fit(self, points: np.array):
+        print("Mean-shift starts.")
+        start = time.time()
+        
         n, d = points.shape
 
         shift_points = np.array(points)
         if_shift = [True for _ in range(n)]
 
         # shift
+        interation = 0
         max_shift_dist = None
         while max_shift_dist is None or max_shift_dist > SHIFT_THRESHOLD:
             max_shift_dist = 0
@@ -57,6 +61,9 @@ class MeanShift:
                 if_shift[idx] = shift_dist > SHIFT_THRESHOLD
                 # shift
                 shift_points[idx] = shift_point
+            interation += 1
+            if interation % 10 == 0:
+                print(f"iter={interation}, max_shift_dist={max_shift_dist}")
 
         # cluster
         cluster_ids = [0]
@@ -65,7 +72,6 @@ class MeanShift:
 
         for idx in range(1, n):
             point = shift_points[idx]
-
             for center_idx, center in enumerate(cluster_centers):
                 dist = np.linalg.norm(center - point)
                 if dist < CLUSTER_THRESHOLD:
@@ -75,35 +81,18 @@ class MeanShift:
                 cluster_ids.append(cluster_idx)
                 cluster_centers.append(point)
                 cluster_idx += 1
+
+
+        end = time.time()
+        print("Mean-shift done.", f"(t={end-start}s, iter={interation})")
+
         return np.array(cluster_ids)
 
 
 
 if __name__ == "__main__":
-    # h = 1.7
-
-    for dataset in DATA_Q1:
-        points = DATA_Q1[dataset]["X"].T  # (2,200)
-
-        cluster_nums = []
-        hs = np.arange(1.1, 10, 0.1)
-        for h in hs:
-            ms = MeanShift(h)
-            labels = ms.fit(points)
-            cluster_num = len(set(labels))
-            cluster_nums.append(cluster_num)
-            # print(h, len(set(labels)))
-
-        # plot(points, labels, f"{dataset}-ms")
-        fig = plt.figure(dpi=300)
-        plt.xlabel("bandwidth h")
-        plt.ylabel("cluster number")
-        plt.plot(hs, cluster_nums)
-        fig.savefig(f"p1-imgs/{dataset}-ms-senstive")
-
-
-        # Testing meanshift.
-        # from sklearn.cluster import MeanShift
-        # clustering = MeanShift(bandwidth=3.7).fit(X.T)
-        # plot(X, clustering.labels_, f"{dataset}-test-ms")
+    pass
+    # Testing meanshift.
+    # from sklearn.cluster import MeanShift
+    # clustering = MeanShift(bandwidth=3.7).fit(X.T)
 

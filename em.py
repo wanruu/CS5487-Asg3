@@ -1,5 +1,6 @@
+import time
 import numpy as np
-from utils import DATA_Q1, plot, euclidean, centers_init
+from utils import euclidean, centers_init
 
 
 class EM:
@@ -11,7 +12,6 @@ class EM:
         if model == "mv_gaussian":
             self.prob = self.mv_gaussian
             self.ll = self.mv_gaussian_ll
-
 
 
     def mv_gaussian(self, point, mean, covar, log=True):
@@ -30,6 +30,9 @@ class EM:
 
 
     def fit(self, points, k):
+        print("EM starts.")
+        start = time.time()
+
         # initialize
         n, d = points.shape
         pis = np.ones(k) / k  # (k,)
@@ -39,7 +42,12 @@ class EM:
         # log-likelihood
         last_ll = self.ll(points, pis, means, covars)
 
-        interations = 0
+
+        end = time.time()
+        print("Initialization done.", f"(t={end-start}s)")
+
+        start = time.time()
+        interation = 0
         while True:
             # e-step: calculate z
             l_ij = [[np.log(pis[j]) + self.prob(points[i], means[j], covars[j], True) for j in range(k)] for i in range(n)]  # (n,k)
@@ -65,35 +73,32 @@ class EM:
 
             # log-likelihood
             cur_ll = self.ll(points, pis, means, covars)
-            print(interations, abs(last_ll - cur_ll))
-            if abs(last_ll - cur_ll) < 1e-5:
+            ll_delta = abs(last_ll - cur_ll)
+            if ll_delta < 1e-5:
                 break
             last_ll = cur_ll
 
-            interations += 1
+
+            interation += 1
+            if interation % 10 == 0:
+                print(f"iter={interation}, ll={cur_ll}, ll_delta={ll_delta}")
 
 
         labels = np.array([np.argmax(z[i,:]) for i in range(n)])
+
+        end = time.time()
+        print("EM done.", f"(t={end-start}s, iter={interation})")
 
         return labels
 
 
 if __name__ == "__main__":
-    for dataset in DATA_Q1:
-        points = DATA_Q1[dataset]["X"].T  # (2,200)
+    pass
+    # Testing
+    # from sklearn.mixture import GaussianMixture
 
-        em = EM()
-        labels = em.fit(points, 4)
-        plot(points, labels, f"{dataset}-em")
-
-        # Testing
-        # from sklearn.mixture import GaussianMixture
-
-        # gmm = GaussianMixture(n_components=4, covariance_type='full', random_state=0)
-        # gmm.fit(points)
-        # labels = gmm.predict(points)
-        # plot(points.T, labels, f"{dataset}-test-em")
-
-
-
+    # gmm = GaussianMixture(n_components=4, covariance_type='full', random_state=0)
+    # gmm.fit(points)
+    # labels = gmm.predict(points)
+    # plot(points.T, labels, f"{dataset}-test-em")
 

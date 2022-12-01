@@ -5,6 +5,7 @@ from mean_shift import MeanShift
 from utils import DATA_Q2, ID_Q2
 
 import os
+import numpy as np
 import pylab as pl
 
 
@@ -29,8 +30,12 @@ def plot():
     pl.imshow(csegm)
 
 
-DATA_Q2 = DATA_Q2[:1]
+import scipy.cluster.vq as vq
+
+DATA_Q2 = DATA_Q2#[:1]
 for idx, img in enumerate(DATA_Q2):
+    if ID_Q2[idx] != "12003":
+        continue
     # create directory
     save_path = f"{IMG_PATH}/{ID_Q2[idx]}"
     if not os.path.exists(save_path):
@@ -39,28 +44,32 @@ for idx, img in enumerate(DATA_Q2):
     # extract feature
     X, L = helper.getfeatures(img, 7)  # X: (4, 3060)
 
-    # kmeans, em
-    for k in range(20, 30):
-        # kmeans
-        kmeans = KMeans()
-        labels = kmeans.fit(X.T, k) + 1
+    # -------------- kmeans --------------
+    # for k in np.arange(50, 51, 1):
+    #     kmeans = KMeans()
+    #     labels = kmeans.fit(X.T, k) + 1
+    #     # labels = kmeans.fit(vq.whiten(X.T), k) + 1
+    #     # _, labels = vq.kmeans2(X.T, 2, iter=1000, minit='random')
+    #     # labels = labels + 1
+    #     plot()
+    #     pl.savefig(f"{save_path}/kmeans(k={k})")
+    # ------------------------------------
+
+    # ---------------- em ----------------
+    for k in np.arange(20, 21, 1):
+        em = EM()
+        labels = em.fit(X.T, k) + 1
         plot()
-        pl.savefig(f"{save_path}/kmeans(k={k})")
+        pl.savefig(f"{save_path}/em(k={k})")
+    # ------------------------------------
 
-        # em
-        # em = EM()
-        # labels = em.fit(X.T, k) + 1
-        # plot()
-        # pl.savefig(f"{save_path}/em(k={k})")
-
-
-    # # meanshift
-    # for h in range(1, 10):
-    #     # meanshift
+    # ------------- meanshift -------------
+    # for h in np.arange(1, 10,1):
     #     mean_shift = MeanShift(bandwidth=h)
     #     labels = mean_shift.fit(X.T) + 1
     #     name = "meanshift"
     #     plot()
     #     pl.savefig(f"{save_path}/meanshift(h={h})")
+    # ------------------------------------
 
 

@@ -7,9 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import rgb2hex
 
 
-import helper
-
-
+# Data for question 1
 _data = loadmat("PA2-cluster-data/cluster_data.mat")
 DATA_Q1 = {
     dataset: {
@@ -18,23 +16,10 @@ DATA_Q1 = {
 }
 
 
+# Data for question 2
 _filenames = ["images/"+f for f in os.listdir("images/") if f[-4:] == ".jpg"]
 DATA_Q2 = [Image.open(f) for f in _filenames]
 ID_Q2 = [re.search(r"(\d+)\.jpg", f).group(1) for f in _filenames]
-
-
-def plot(points, labels, title, centers=[], dirname="p1-imgs"):
-    fig = plt.figure(dpi=300)
-    plt.title(title)
-
-    n = points.shape[0]
-    colors = tuple([(np.random.random(), np.random.random(), np.random.random()) for _ in range(n)])
-    colors = [rgb2hex(x) for x in colors]
-
-    for idx, cluster in enumerate(list(labels)):
-        plt.scatter([points[idx][0]], [points[idx][1]], c=colors[int(cluster)])
-
-    fig.savefig(f"{dirname}/"+title)
 
 
 

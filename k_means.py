@@ -1,5 +1,8 @@
+import tqdm
+import time
 import numpy as np
-from utils import DATA_Q1, plot, euclidean, centers_init
+
+from utils import euclidean, centers_init
 
 
 class KMeans:
@@ -14,12 +17,17 @@ class KMeans:
         """
         points: (n,d)
         """
+        print("K-means starts.")
         n = points.shape[0]
 
+        start = time.time()
         centers = self.centers_init(points, k, self.dist_func)  # (k,d)
         labels = np.zeros(n) - 1  # (n,)
+        end = time.time()
+        print("Initialization done.", f"(t={end-start}s)")
 
-        for _ in range(self.max_iter):
+        start = time.time()
+        for interation in tqdm.tqdm(range(self.max_iter)):
             last_labels = np.copy(labels)
 
             # cluster assignment
@@ -34,17 +42,13 @@ class KMeans:
 
             if np.all(last_labels == labels):
                 break
+        end = time.time()
+        print("K-means done.", f"(t={end-start}s, iter={interation})")
 
         return labels
 
 
 
 if __name__ == "__main__":
-
-    for dataset in DATA_Q1:
-        points = DATA_Q1[dataset]["X"].T  # (2,200)
-
-        kmeans = KMeans()
-        labels = kmeans.fit(points, 4)
-        plot(points, labels, f"{dataset}-kmeans")
+    pass
 
