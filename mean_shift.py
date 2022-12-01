@@ -84,7 +84,7 @@ class MeanShift:
 
 
         end = time.time()
-        print("Mean-shift done.", f"(t={end-start}s, iter={interation})")
+        print("Mean-shift done.", f"(t={end-start}s, iter={interation}, cluster={cluster_idx})")
 
         return np.array(cluster_ids)
 

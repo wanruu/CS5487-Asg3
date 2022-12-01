@@ -45,7 +45,7 @@ for idx, img in enumerate(DATA_Q2):
     X, L = helper.getfeatures(img, 7)  # X: (4, 3060)
 
     # -------------- kmeans --------------
-    # for k in np.arange(50, 51, 1):
+    # for k in np.arange(10, 11, 1):
     #     kmeans = KMeans()
     #     labels = kmeans.fit(X.T, k) + 1
     #     # labels = kmeans.fit(vq.whiten(X.T), k) + 1
@@ -56,20 +56,21 @@ for idx, img in enumerate(DATA_Q2):
     # ------------------------------------
 
     # ---------------- em ----------------
-    for k in np.arange(20, 21, 1):
-        em = EM()
-        labels = em.fit(X.T, k) + 1
-        plot()
-        pl.savefig(f"{save_path}/em(k={k})")
+    # for k in np.arange(8, 11, 1):
+    #     em = EM()
+    #     labels = em.fit(X.T, k) + 1
+    #     plot()
+    #     pl.savefig(f"{save_path}/em(k={k})")
     # ------------------------------------
 
     # ------------- meanshift -------------
-    # for h in np.arange(1, 10,1):
-    #     mean_shift = MeanShift(bandwidth=h)
-    #     labels = mean_shift.fit(X.T) + 1
-    #     name = "meanshift"
-    #     plot()
-    #     pl.savefig(f"{save_path}/meanshift(h={h})")
+    for h in np.arange(1, 50, 1):
+        mean_shift = MeanShift(bandwidth=h)
+        labels = mean_shift.fit(X.T) + 1
+        name = "meanshift"
+        plot()
+        # h = str("%.1f" % h).replace(".", "_")
+        pl.savefig(f"{save_path}/meanshift(h={h})")
     # ------------------------------------
 
 
