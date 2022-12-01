@@ -1,0 +1,8 @@
+*.png
+p1-imgs/
+p2-imgs/
+images_txt/
+PA2-cluster-data/cluster_data_text/
+__pycache__/
+2.py
+test_pa2.py
